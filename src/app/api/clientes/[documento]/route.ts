@@ -83,7 +83,7 @@ export async function GET(
       console.log('⚠️ Resposta 400 da Bluesoft API - Cliente não cadastrado.');
       return NextResponse.json(
         { message: 'Cliente não cadastrado' },
-        { status: 400 }
+        { status: 200 }
       );
     }
 
