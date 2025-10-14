@@ -7,7 +7,7 @@ export async function GET(
   console.log('🚀 [API] Iniciando GET /api/pedidos/[idProduto]');
 
   // --- 1. RECEBER O ID DO PRODUTO ---
-  const idProduto = request.nextUrl.searchParams.get('idProduto');
+  const idProduto = context.params.idProduto;
   console.log('📦 Parâmetro recebido:', idProduto);
 
   if (!idProduto) {
