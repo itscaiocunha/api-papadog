@@ -1,13 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { idProduto: string } }
-) {
-  const { idProduto } = params;
+export async function GET(req: Request) {
+  // Extrai o idProduto do path: /api/pedidos/123 -> "123"
+  const url = new URL(req.url);
+  const segments = url.pathname.split('/').filter(Boolean);
+  const idProduto = segments[segments.length - 1];
+
+  if (!idProduto) {
+    return NextResponse.json(
+      { error: 'Parâmetro [idProduto] é obrigatório na URL.' },
+      { status: 400 }
+    );
+  }
 
   const baseUrl = process.env.BLUESOFT_API_BASE_URL;
   const customToken = process.env.BLUESOFT_CUSTOM_TOKEN;
+
   if (!baseUrl || !customToken) {
     return NextResponse.json(
       { error: 'Configuração interna do servidor incompleta.' },
@@ -21,6 +29,7 @@ export async function GET(
   } as const;
 
   try {
+    // (Opcional) validação do produto
     const produtoApiUrl = `${baseUrl}/comercial/produtos/${idProduto}?pageSize=1000`;
     const produtoResponse = await fetch(produtoApiUrl, { headers, cache: 'no-store' });
     if (!produtoResponse.ok) {
@@ -30,6 +39,7 @@ export async function GET(
       );
     }
 
+    // Estoque
     const estoqueApiUrl = `${baseUrl}/comercial/estoques?lojaKey=10&produtoKey=${idProduto}`;
     const estoqueResponse = await fetch(estoqueApiUrl, { headers, cache: 'no-store' });
 
