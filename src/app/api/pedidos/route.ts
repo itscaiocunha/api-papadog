@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  context: { params: { idProduto: string } }
+  context: { idProduto: string }
 ) {
 
   // --- 1. RECEBER O ID DO PRODUTO ---
