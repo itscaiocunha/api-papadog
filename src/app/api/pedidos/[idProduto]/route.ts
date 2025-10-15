@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
-  // Extrai o idProduto do path: /api/pedidos/123 -> "123"
   const url = new URL(req.url);
   const segments = url.pathname.split('/').filter(Boolean);
   const idProduto = segments[segments.length - 1];
