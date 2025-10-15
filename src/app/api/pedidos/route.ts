@@ -2,18 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { idProduto: string } }
+  context: { params: { idProduto: string } }
 ) {
-  console.log('🚀 [API] Iniciando GET /api/produtos/[idProduto]');
+  console.log('🚀 [API] Iniciando GET /api/pedidos/[idProduto]');
 
   // --- 1. RECEBER O ID DO PRODUTO ---
-  const { idProduto } = params;
-  console.log('📦 Parâmetro de rota recebido:', idProduto);
+  const idProduto = request.nextUrl.searchParams.get('idProduto');
+  console.log('📦 Parâmetro recebido:', idProduto);
 
   if (!idProduto) {
-    console.warn('⚠️ Parâmetro [idProduto] ausente na rota');
+    console.warn('⚠️ Parâmetro [idProduto] ausente na URL');
     return NextResponse.json(
-      { error: 'Parâmetro [idProduto] é obrigatório na rota.' },
+      { error: 'Parâmetro [idProduto] é obrigatório na URL.' },
       { status: 400 }
     );
   }
