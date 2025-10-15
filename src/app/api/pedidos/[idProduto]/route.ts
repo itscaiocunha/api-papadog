@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-type Ctx = { params: { idProduto: string } };
-
-export async function GET(_request: NextRequest, { params }: Ctx) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: { idProduto: string } }
+) {
   const { idProduto } = params;
 
   const baseUrl = process.env.BLUESOFT_API_BASE_URL;
