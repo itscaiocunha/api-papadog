@@ -134,8 +134,8 @@ export async function GET(
     const respostaFormatada = {
       nome: infoData.descricao,
       gtins: infoData.gtins || [],
-      saldoFisico: estoque.saldoFisico,
-      precoNormal: precoObj ? precoObj.precoNormal : 0.0,
+      estoque: estoque.saldoFisico,
+      preco: precoObj ? precoObj.precoNormal : 0.0,
     };
 
     console.log('🟢 Resposta formatada enviada:', respostaFormatada);
