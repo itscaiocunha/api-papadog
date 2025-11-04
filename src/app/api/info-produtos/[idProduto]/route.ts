@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// --- CORREÇÃO 1: A assinatura da função foi alterada ---
-// Antes: context: { params: { idProduto: string } }
-// Agora: { params }: { params: { idProduto: string } }
+// --- CORREÇÃO 1: Assinatura da função ajustada para corresponder ao seu projeto ---
 export async function GET(
   request: NextRequest,
-  { params }: { params: { idProduto: string } }
+  context: { params: Promise<{ idProduto: string }> }
 ) {
-  // Log atualizado para refletir seu nome de pasta
   console.log('🚀 [API] Iniciando GET /api/info-produtos/[idProduto]');
 
   // --- 2. PARÂMETROS ---
-  // --- CORREÇÃO 2: Acessamos 'params' diretamente ---
-  // Antes: const { idProduto } = context.params;
-  // Agora: const { idProduto } = params;
-  const { idProduto } = params;
+  // --- CORREÇÃO 2: Usando 'await' para obter os parâmetros ---
+  const { idProduto } = await context.params;
   console.log('📦 Parâmetro recebido:', idProduto);
 
   if (!idProduto) {
@@ -154,7 +149,6 @@ export async function GET(
       { status: 500 }
     );
   } finally {
-    // Log atualizado
     console.log('🏁 [API] Finalizando execução de /api/info-produtos/[idProduto]');
   }
 }
