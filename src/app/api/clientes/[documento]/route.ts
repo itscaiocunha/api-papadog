@@ -53,20 +53,45 @@ export async function GET(
     console.log('   ↳ OK:', apiResponse.ok);
 
     // --- STATUS 200 ---
-    if (apiResponse.status === 200) {
-      const data = await apiResponse.json();
-      console.log('📊 Dados retornados pela Bluesoft API:', data);
+    // --- STATUS 200 ---
+    if (apiResponse.status === 200) {
+      const data = await apiResponse.json();
+      console.log('📊 Dados retornados pela Bluesoft API:', data);
 
-      if (data && Array.isArray(data.data) && data.data.length > 0) {
-        const client = data.data[0];
-        console.log('🟢 Cliente encontrado na base.');
-        console.log('👤 Nome:', client.nomeRazao);
-        console.log('🆔 CPF/CNPJ:', client.cpfCnpj);
-        console.log('🏠 Endereços:', client.enderecos);
-        console.log('📞 Contatos:', client.contatos);
+      if (data && Array.isArray(data.data) && data.data.length > 0) {
+        const client = data.data[0];
+        console.log('🟢 Cliente encontrado na base.');
+        console.log('👤 Nome:', client.nomeRazao);
+        console.log('🆔 CPF/CNPJ:', client.cpfCnpj);
+        console.log('🏠 Endereços:', client.enderecos);
+        console.log('📞 Contatos:', client.contatos);
 
+        // --- PREPARAÇÃO DA RESPOSTA COM DADOS ---
+        // Pega o primeiro endereço, se existir
+        const primaryAddress = (client.enderecos && client.enderecos.length > 0) 
+                              ? client.enderecos[0] 
+                              : null;
+
+        // Monta o objeto de endereço conforme solicitado
+        const enderecoFormatado = primaryAddress 
+          ? {
+              rua: primaryAddress.rua,
+              numero: primaryAddress.numero,
+              bairro: primaryAddress.bairro,
+              cidade: primaryAddress.cidade,
+              uf: primaryAddress.uf,
+              cep: primaryAddress.cep,
+            }
+          : null; // Retorna null se não houver endereço
+
+        // Monta a resposta final
         return NextResponse.json(
-          { message: 'Cliente já cadastrado' },
+{ 
+            message: 'Cliente já cadastrado',
+            nomeRazao: client.nomeRazao, 
+            cpfCnpj: client.cpfCnpj,
+            endereco: enderecoFormatado 
+          },
           { status: 200 }
         );
       } else {
@@ -74,9 +99,9 @@ export async function GET(
         return NextResponse.json(
           { message: 'Cliente não cadastrado' },
           { status: 404 }
-        );
-      }
-    }
+       );
+     }
+  }
 
     // --- STATUS 400 ---
     if (apiResponse.status === 400) {
