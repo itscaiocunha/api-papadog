@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// --- CORREÇÃO 1: A assinatura da função foi alterada ---
+// Antes: context: { params: { idProduto: string } }
+// Agora: { params }: { params: { idProduto: string } }
 export async function GET(
   request: NextRequest,
-  context: { params: { idProduto: string } }
+  { params }: { params: { idProduto: string } }
 ) {
-  console.log('🚀 [API] Iniciando GET /api/info-produto/[idProduto]');
+  // Log atualizado para refletir seu nome de pasta
+  console.log('🚀 [API] Iniciando GET /api/info-produtos/[idProduto]');
 
-  // --- 1. PARÂMETROS ---
-  const { idProduto } = context.params;
+  // --- 2. PARÂMETROS ---
+  // --- CORREÇÃO 2: Acessamos 'params' diretamente ---
+  // Antes: const { idProduto } = context.params;
+  // Agora: const { idProduto } = params;
+  const { idProduto } = params;
   console.log('📦 Parâmetro recebido:', idProduto);
 
   if (!idProduto) {
@@ -18,7 +25,7 @@ export async function GET(
     );
   }
 
-  // --- 2. VARIÁVEIS DE AMBIENTE ---
+  // --- 3. VARIÁVEIS DE AMBIENTE ---
   const baseUrl = process.env.BLUESOFT_API_BASE_URL;
   const customToken = process.env.BLUESOFT_CUSTOM_TOKEN;
 
@@ -32,7 +39,7 @@ export async function GET(
     );
   }
 
-  // --- 3. DEFINIÇÃO DAS CHAMADAS ---
+  // --- 4. DEFINIÇÃO DAS CHAMADAS ---
   const headers = {
     'Content-Type': 'application/json',
     'X-Customtoken': customToken,
@@ -48,7 +55,7 @@ export async function GET(
   console.log('🧭 URL Estoque:', urls.estoque);
   console.log('🧭 URL Preços:', urls.precos);
 
-  // --- 4. CHAMADA ÀS APIs ---
+  // --- 5. CHAMADA ÀS APIs ---
   try {
     console.log('📡 Enviando requisições paralelas para a Bluesoft API...');
 
@@ -63,7 +70,7 @@ export async function GET(
     console.log('   ↳ Estoque Status:', estoqueResponse.status);
     console.log('   ↳ Preços Status:', precoResponse.status);
 
-    // --- 5. VERIFICAÇÃO PRINCIPAL (INFO GERAIS) ---
+    // --- 6. VERIFICAÇÃO PRINCIPAL (INFO GERAIS) ---
     if (infoResponse.status === 404) {
       console.log('🔴 Produto não encontrado (404).');
       return NextResponse.json(
@@ -84,7 +91,7 @@ export async function GET(
       );
     }
 
-    // --- 6. PROCESSAMENTO E FORMATAÇÃO DA RESPOSTA ---
+    // --- 7. PROCESSAMENTO E FORMATAÇÃO DA RESPOSTA ---
 
     // Processa Info Gerais (obrigatório)
     const infoData = await infoResponse.json();
@@ -101,13 +108,9 @@ export async function GET(
     }
 
     // Processa Preços (opcional)
-    
-    // ***** LINHA CORRIGIDA AQUI *****
-    // Definimos o tipo esperado para a array 'precos' para evitar o erro 'never[]'
     let precoData: { precos: { lojaKey: number; precoNormal: number }[] } = {
       precos: [],
     };
-    // *******************************
 
     if (precoResponse.ok) {
       precoData = await precoResponse.json();
@@ -127,23 +130,17 @@ export async function GET(
         : { saldoFisico: 0 }; // Padrão com o campo esperado
 
     // Pega o preço da lojaKey 10
-    // Agora o TypeScript sabe o tipo de 'p' e não dará erro
     const precoObj =
       precoData.precos && precoData.precos.length > 0
         ? precoData.precos.find((p) => p.lojaKey === 10)
         : null;
 
-    // Monta a resposta final com os campos exatos que você pediu
+    // Monta a resposta final
     const respostaFormatada = {
-      // Info Gerais
       nome: infoData.descricao,
-      codBarras: infoData.gtins,
-
-      // Estoque
-      estoque: estoque.saldoFisico,
-
-      // Preço
-      preco: precoObj ? precoObj.precoNormal : 0.0,
+      gtins: infoData.gtins || [],
+      saldoFisico: estoque.saldoFisico,
+      precoNormal: precoObj ? precoObj.precoNormal : 0.0,
     };
 
     console.log('🟢 Resposta formatada enviada:', respostaFormatada);
@@ -157,6 +154,7 @@ export async function GET(
       { status: 500 }
     );
   } finally {
-    console.log('🏁 [API] Finalizando execução de /api/info-produto/[idProduto]');
+    // Log atualizado
+    console.log('🏁 [API] Finalizando execução de /api/info-produtos/[idProduto]');
   }
 }
